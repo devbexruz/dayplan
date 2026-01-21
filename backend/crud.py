@@ -172,19 +172,32 @@ def create_exercise_type(db: Session, exercise: schemas.ExerciseTypeCreate, owne
     return db_exercise
 
 def get_sport_logs(db: Session, owner_id: int, date: date = None):
+    today_str = str(date) if date else None
+    
+    # Base query
     query = db.query(models.SportLog).options(joinedload(models.SportLog.exercise_type)).filter(models.SportLog.owner_id == owner_id)
+    
     if date:
-        # Filter by day (ignoring time) - SQLite specific or generic check
-        # date is Today
         today = date
-        # All ExerciseType for Today
+        # Filter query by date as well
+        query = query.filter(func.date(models.SportLog.date) == today_str)
+        
         # Get all ExerciseType for Today
         exercise_types = db.query(models.ExerciseType).filter(models.ExerciseType.owner_id == owner_id).all()
+        
         # create sport log for each exercise type if not exists
         for exercise_type in exercise_types:
-            if not db.query(models.SportLog).filter(models.SportLog.owner_id == owner_id, models.SportLog.exercise_type_id == exercise_type.id, models.SportLog.date == today).first():
+            # Check using func.date to match day regardless of time
+            exists = db.query(models.SportLog).filter(
+                models.SportLog.owner_id == owner_id, 
+                models.SportLog.exercise_type_id == exercise_type.id, 
+                func.date(models.SportLog.date) == today_str
+            ).first()
+            
+            if not exists:
                 db.add(models.SportLog(exercise_type_id=exercise_type.id, date=today, owner_id=owner_id))
         db.commit()
+    
     return query.all()
 
 def create_sport_log(db: Session, log: schemas.SportLogCreate, owner_id: int):
