@@ -14,8 +14,11 @@ def create_finance_category(db: Session, category: schemas.FinanceCategoryCreate
     db.refresh(db_category)
     return db_category
 
-def get_finances(db: Session, owner_id: int, skip: int = 0, limit: int = 100):
-    return db.query(models.Finance).options(joinedload(models.Finance.category)).filter(models.Finance.owner_id == owner_id).offset(skip).limit(limit).all()
+def get_finances(db: Session, owner_id: int, skip: int = 0, limit: int = 100, date: date = None):
+    query = db.query(models.Finance).options(joinedload(models.Finance.category)).filter(models.Finance.owner_id == owner_id)
+    if date:
+        query = query.filter(func.date(models.Finance.date) == str(date))
+    return query.order_by(models.Finance.date.desc()).offset(skip).limit(limit).all()
 
 def create_finance(db: Session, finance: schemas.FinanceCreate, owner_id: int):
     # ... (existing content)
@@ -349,8 +352,32 @@ def update_mind_task_type(db: Session, type_id: int, type_update: schemas.MindTa
         db.refresh(db_type)
     return db_type
 
-def get_mind_logs(db: Session, owner_id: int):
-    return db.query(models.MindLog).options(joinedload(models.MindLog.task_type)).filter(models.MindLog.owner_id == owner_id).all()
+def get_mind_logs(db: Session, owner_id: int, date: date = None):
+    query = db.query(models.MindLog).options(joinedload(models.MindLog.task_type)).filter(models.MindLog.owner_id == owner_id)
+    
+    if date:
+        today_str = str(date)
+        query = query.filter(func.date(models.MindLog.date) == today_str)
+        
+        # Auto-create logs for active task types
+        # Filter for active task types
+        task_types = db.query(models.MindTaskType).filter(
+            models.MindTaskType.owner_id == owner_id,
+            models.MindTaskType.is_active == True
+        ).all()
+        
+        for task_type in task_types:
+            exists = db.query(models.MindLog).filter(
+                models.MindLog.owner_id == owner_id,
+                models.MindLog.task_type_id == task_type.id,
+                func.date(models.MindLog.date) == today_str
+            ).first()
+            
+            if not exists:
+                db.add(models.MindLog(task_type_id=task_type.id, date=date, owner_id=owner_id))
+        db.commit()
+        
+    return query.all()
 
 def create_mind_log(db: Session, log: schemas.MindLogCreate, owner_id: int):
     db_log = models.MindLog(**log.model_dump(), owner_id=owner_id)

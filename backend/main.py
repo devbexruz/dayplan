@@ -97,7 +97,9 @@ def create_finance_category(category: schemas.FinanceCategoryCreate, db: Session
 
 @app.get("/finance/", response_model=List[schemas.Finance])
 def read_finances(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return crud.get_finances(db, owner_id=MOCK_USER_ID, skip=skip, limit=limit)
+    # Filter by today
+    today = datetime.now().date()
+    return crud.get_finances(db, owner_id=MOCK_USER_ID, skip=skip, limit=limit, date=today)
 
 @app.post("/finance/", response_model=schemas.Finance)
 def create_finance(finance: schemas.FinanceCreate, db: Session = Depends(get_db)):
@@ -234,7 +236,8 @@ def update_mind_task_type(type_id: int, task: schemas.MindTaskTypeCreate, db: Se
 
 @app.get("/mind/logs/", response_model=List[schemas.MindLog])
 def read_mind_logs(db: Session = Depends(get_db)):
-    return crud.get_mind_logs(db, owner_id=MOCK_USER_ID)
+    today = datetime.now().date()
+    return crud.get_mind_logs(db, owner_id=MOCK_USER_ID, date=today)
 
 @app.post("/mind/logs/", response_model=schemas.MindLog)
 def create_mind_log(log: schemas.MindLogCreate, db: Session = Depends(get_db)):

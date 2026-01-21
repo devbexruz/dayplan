@@ -301,6 +301,7 @@ class AnalyticsService:
         sleeps = self.repo.get_sleep_logs(start, end)
         minds = self.repo.get_mind_logs(start, end)
         finances = self.repo.get_finances(start, end)
+        sports = self.repo.get_sport_logs(start, end)
         
         history = []
         
@@ -329,6 +330,10 @@ class AnalyticsService:
              elif module_type == 'mind_tasks':
                  d_minds = [m for m in minds if m.date.date() == day and m.is_completed]
                  val = float(len(d_minds))
+            
+             elif module_type == 'health_sport':
+                 d_sports = [s for s in sports if s.date.date() == day and s.is_completed]
+                 val = float(len(d_sports))
 
              elif module_type == 'finance_expense':
                  d_fin = [f for f in finances if f.date.date() == day and f.type == 'expense']
