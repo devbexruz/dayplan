@@ -261,6 +261,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
       return;
     }
 
+    final nameController = TextEditingController(text: type.name);
     final setsController = TextEditingController(text: type.sets.toString());
     final repsController = TextEditingController(text: type.reps.toString());
 
@@ -268,13 +269,23 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.surface,
-        title: Text(
-          'Tahrirlash: ${type.name}',
-          style: const TextStyle(color: Colors.white),
-        ),
+        title: const Text('Tahrirlash', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            TextField(
+              controller: nameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: 'Mashq nomi',
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -323,7 +334,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               try {
                 await repo.updateExerciseType(
                   id: type.id,
-                  name: type.name,
+                  name: nameController.text,
                   sets: int.tryParse(setsController.text) ?? 0,
                   reps: int.tryParse(repsController.text) ?? 0,
                   isActive: type.isActive,

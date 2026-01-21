@@ -134,7 +134,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.5,
+              childAspectRatio: 1.4,
               children: [
                 _buildStatusCard(
                   context,
@@ -448,7 +448,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     bool isCompleted,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
@@ -481,7 +481,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 status,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 14,
                   color: isCompleted ? Colors.white : Colors.white54,
                 ),
               ),

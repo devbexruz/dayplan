@@ -150,21 +150,25 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                     // Summary Items
                     dailyStatsAsync.when(
                       data: (stats) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildSummaryItem(
-                            context,
-                            'Bugungi Kirim',
-                            '+${formatCurrency(stats.totalIncome)} so\'m',
-                            Icons.arrow_downward,
-                            Colors.greenAccent,
+                          Expanded(
+                            child: _buildSummaryItem(
+                              context,
+                              'Bugungi Kirim',
+                              '+${formatCurrency(stats.totalIncome)} so\'m',
+                              Icons.arrow_downward,
+                              Colors.greenAccent,
+                            ),
                           ),
-                          _buildSummaryItem(
-                            context,
-                            'Bugungi Chiqim',
-                            '-${formatCurrency(stats.totalExpense)} so\'m',
-                            Icons.arrow_upward,
-                            Colors.redAccent,
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildSummaryItem(
+                              context,
+                              'Bugungi Chiqim',
+                              '-${formatCurrency(stats.totalExpense)} so\'m',
+                              Icons.arrow_upward,
+                              Colors.redAccent,
+                            ),
                           ),
                         ],
                       ),
@@ -316,22 +320,26 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           child: Icon(icon, color: color, size: 20),
         ),
         const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
-            ),
-            Text(
-              amount,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(color: Colors.white70, fontSize: 10),
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+              Text(
+                amount,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ],
     );

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 import models, schemas
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 # --- FINANCE ---
 def get_finance_categories(db: Session, owner_id: int):
@@ -171,11 +171,20 @@ def create_exercise_type(db: Session, exercise: schemas.ExerciseTypeCreate, owne
     db.refresh(db_exercise)
     return db_exercise
 
-def get_sport_logs(db: Session, owner_id: int, date: datetime = None):
+def get_sport_logs(db: Session, owner_id: int, date: date = None):
     query = db.query(models.SportLog).options(joinedload(models.SportLog.exercise_type)).filter(models.SportLog.owner_id == owner_id)
     if date:
         # Filter by day (ignoring time) - SQLite specific or generic check
-        pass 
+        # date is Today
+        today = date.date()
+        # All ExerciseType for Today
+        # Get all ExerciseType for Today
+        exercise_types = db.query(models.ExerciseType).filter(models.ExerciseType.owner_id == owner_id).all()
+        # create sport log for each exercise type if not exists
+        for exercise_type in exercise_types:
+            if not db.query(models.SportLog).filter(models.SportLog.owner_id == owner_id, models.SportLog.exercise_type_id == exercise_type.id, models.SportLog.date == today).first():
+                db.add(models.SportLog(exercise_type_id=exercise_type.id, date=today, owner_id=owner_id))
+        db.commit()
     return query.all()
 
 def create_sport_log(db: Session, log: schemas.SportLogCreate, owner_id: int):

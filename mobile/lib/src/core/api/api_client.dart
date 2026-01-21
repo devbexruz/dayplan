@@ -10,10 +10,10 @@ class ApiClient {
   }
 
   ApiClient._internal() {
-    String baseUrl = 'http://127.0.0.1:8000';
+    String baseUrl = 'http://45.138.158.199:5050';
     try {
       if (Platform.isAndroid) {
-        baseUrl = 'http://10.0.2.2:8000';
+        baseUrl = 'http://45.138.158.199:5050';
       }
     } catch (e) {
       // Platform check might fail on web, ignore

@@ -150,7 +150,8 @@ def update_exercise_type(type_id: int, exercise: schemas.ExerciseTypeCreate, db:
 @app.get("/health/sport-logs/", response_model=List[schemas.SportLog])
 def read_sport_logs(db: Session = Depends(get_db)):
     # Optional date filter could be added as query param
-    return crud.get_sport_logs(db, owner_id=MOCK_USER_ID)
+    today = datetime.now().date()
+    return crud.get_sport_logs(db, owner_id=MOCK_USER_ID, date=today)
 
 @app.post("/health/sport-logs/", response_model=schemas.SportLog)
 def create_sport_log(log: schemas.SportLogCreate, db: Session = Depends(get_db)):
