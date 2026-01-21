@@ -328,11 +328,11 @@ class AnalyticsService:
                  val = hours
                  
              elif module_type == 'mind_tasks':
-                 d_minds = [m for m in minds if m.date.date() == day and m.is_completed]
+                 d_minds = [m for m in minds if m.date.date() == day and m.is_completed is True]
                  val = float(len(d_minds))
             
              elif module_type == 'health_sport':
-                 d_sports = [s for s in sports if s.date.date() == day and s.is_completed]
+                 d_sports = [s for s in sports if s.date.date() == day and s.is_completed is True]
                  val = float(len(d_sports))
 
              elif module_type == 'finance_expense':

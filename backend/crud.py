@@ -198,7 +198,7 @@ def get_sport_logs(db: Session, owner_id: int, date: date = None):
             ).first()
             
             if not exists:
-                db.add(models.SportLog(exercise_type_id=exercise_type.id, date=today, owner_id=owner_id))
+                db.add(models.SportLog(exercise_type_id=exercise_type.id, date=today, owner_id=owner_id, is_completed=False))
         db.commit()
     
     return query.all()
@@ -374,7 +374,7 @@ def get_mind_logs(db: Session, owner_id: int, date: date = None):
             ).first()
             
             if not exists:
-                db.add(models.MindLog(task_type_id=task_type.id, date=date, owner_id=owner_id))
+                db.add(models.MindLog(task_type_id=task_type.id, date=date, owner_id=owner_id, is_completed=False))
         db.commit()
         
     return query.all()
