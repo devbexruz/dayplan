@@ -298,7 +298,6 @@ class AnalyticsService:
         
         # Fetch all raw data for range
         works = self.repo.get_works(start, end)
-        sleeps = self.repo.get_sleep_logs(start, end)
         minds = self.repo.get_mind_logs(start, end)
         finances = self.repo.get_finances(start, end)
         sports = self.repo.get_sport_logs(start, end)
@@ -310,11 +309,34 @@ class AnalyticsService:
         
         total_range = days_count + prev_days_count
         
+        # Parse sub-modules (e.g. health_sport_1, mind_tasks_3)
+        target_id = None
+        base_module = module_type
+        
+        if "health_sport_" in module_type:
+            try:
+                parts = module_type.split("_")
+                # Expected: health, sport, <id>
+                if len(parts) >= 3 and parts[-1].isdigit():
+                    target_id = int(parts[-1])
+                    base_module = "health_sport_single"
+            except:
+                pass
+                
+        if "mind_tasks_" in module_type:
+            try:
+                 parts = module_type.split("_")
+                 if len(parts) >= 3 and parts[-1].isdigit():
+                     target_id = int(parts[-1])
+                     base_module = "mind_tasks_single"
+            except:
+                pass
+
         for i in range(total_range):
              day = start + timedelta(days=i)
              val = 0.0
              
-             if module_type == 'work':
+             if base_module == 'work':
                  d_works = [w for w in works if w.date.date() == day]
                  if d_works:
                      completed = sum(1 for w in d_works if w.is_completed)
@@ -322,20 +344,28 @@ class AnalyticsService:
                  else:
                      val = 0.0
                      
-             elif module_type == 'health_sleep':
+             elif base_module == 'health_sleep':
                  d_sleeps = [s for s in sleeps if s.end_time and s.end_time.date() == day]
                  hours = sum((s.end_time - s.start_time).total_seconds()/3600 for s in d_sleeps)
                  val = hours
                  
-             elif module_type == 'mind_tasks':
+             elif base_module == 'mind_tasks':
                  d_minds = [m for m in minds if m.date.date() == day and m.is_completed is True]
                  val = float(len(d_minds))
+                 
+             elif base_module == 'mind_tasks_single' and target_id:
+                 d_minds = [m for m in minds if m.date.date() == day and m.is_completed is True and m.task_type_id == target_id]
+                 val = float(len(d_minds)) # Should be 0 or 1 usually
             
-             elif module_type == 'health_sport':
+             elif base_module == 'health_sport':
                  d_sports = [s for s in sports if s.date.date() == day and s.is_completed is True]
                  val = float(len(d_sports))
+                 
+             elif base_module == 'health_sport_single' and target_id:
+                 d_sports = [s for s in sports if s.date.date() == day and s.is_completed is True and s.exercise_type_id == target_id]
+                 val = float(len(d_sports)) # Should be 0 or 1
 
-             elif module_type == 'finance_expense':
+             elif base_module == 'finance_expense':
                  d_fin = [f for f in finances if f.date.date() == day and f.type == 'expense']
                  val = sum(f.amount for f in d_fin)
                  
