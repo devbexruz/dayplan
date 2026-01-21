@@ -176,7 +176,7 @@ def get_sport_logs(db: Session, owner_id: int, date: date = None):
     if date:
         # Filter by day (ignoring time) - SQLite specific or generic check
         # date is Today
-        today = date.date()
+        today = date
         # All ExerciseType for Today
         # Get all ExerciseType for Today
         exercise_types = db.query(models.ExerciseType).filter(models.ExerciseType.owner_id == owner_id).all()
